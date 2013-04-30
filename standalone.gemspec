@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Standalone::VERSION
   spec.authors       = ["Nick Markwell"]
   spec.email         = ["nick@duckinator.net"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = %q{Ruby standard library implementation with no dependencies.}
+  spec.summary       = %q{Ruby standard library implementation with no dependencies.}
+  spec.homepage      = "https://github.com/duckinator/standalone"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
@@ -20,4 +20,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
+
+  spec.add_development_dependency "mspec"
 end
