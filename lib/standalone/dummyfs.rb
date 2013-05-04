@@ -5,17 +5,19 @@ module Standalone
     FAKE_GEM_DIR = File.join('home', 'sicuro', '.gem', 'ruby', RUBY_VERSION, 'gems')
     STANDALONE_GEM_PATH = File.join(FAKE_GEM_DIR, 'standalone', 'lib', 'standalone')
 
-    def setup
-      return if @@configured
-      @@configured ||= true
-
-      Dir[File.join(File.dirname(__FILE__), '..', '**', '*.rb')].each do |filename|
-        fake_filename = filename.gsub(File.dirname(__FILE__), '').gsub(%r[^/..], STANDALONE_GEM_PATH)
-        DummyFS.add_real_file(filename, fake_filename)
-      end
-    end
-
     class << self
+      @@configured = false
+
+      def setup
+        return if @@configured
+        @@configured ||= true
+
+        Dir[File.join(File.dirname(__FILE__), '..', '**', '*.rb')].each do |filename|
+          fake_filename = filename.gsub(File.dirname(__FILE__), '').gsub(%r[^/..], STANDALONE_GEM_PATH)
+          DummyFS.add_real_file(filename, fake_filename)
+        end
+      end
+
       def activate!
         $:.clear
         $: << STANDALONE_GEM_PATH
