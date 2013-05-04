@@ -41,7 +41,7 @@ module Standalone
 
       def add_real_file(filename, name = nil)
         name ||= filename
-        DummyFS.add_file(name, open(file).read)
+        DummyFS.add_file(name, open(filename).read)
       end
 
       def get_file(filename)
