@@ -101,24 +101,24 @@ module Standalone
     end
 
     class << self
-      def exist?(file)
-        ::DummyFS.has_file?(file)
+      def exist?(filename)
+        ::DummyFS.has_file?(filename)
       end
       alias :'exists?' :'exist?'
 
       def open(filename, mode = 'r', opt = nil)
         raise ::NotImplementedError, "Sandboxed File.open() only supports reading files."
-        ::DummyFS.get_file(file)
+        ::DummyFS.get_file(filename)
       end
 
       # FIXME: File.file? should actually check if it's a file
-      def file?(file)
-        exist?(file)
+      def file?(filename)
+        exist?(filename)
       end
 
       # FIXME: File.directory? should actually check if it's a directory
-      def directory?(file)
-        exist?(file)
+      def directory?(filename)
+        exist?(filename)
       end
 
       def dirname(path)

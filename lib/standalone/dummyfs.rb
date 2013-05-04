@@ -23,30 +23,30 @@ module Standalone
         $: << STANDALONE_GEM_PATH
       end
 
-      def has_file?(file)
-        ret = find_file(file)
+      def has_file?(filename)
+        ret = find_file(filename)
         ret && !ret.empty?
       end
 
-      def find_file(file)
-        return [] unless file # find_file(nil) => everything.
+      def find_file(filename)
+        return [] unless filename # find_file(nil) => everything.
 
-        @@files.keys.grep(%r[#{file}(\..*)?$])
+        @@files.keys.grep(%r[#{filename}(\..*)?$])
       end
 
-      def add_file(name, contents)
+      def add_file(filename, contents)
         @@files ||= {}
-        @@files[name] = contents
+        @@files[filename] = contents
       end
 
-      def add_real_file(file, name = nil)
-        name ||= file
+      def add_real_file(filename, name = nil)
+        name ||= filename
         DummyFS.add_file(name, open(file).read)
       end
 
-      def get_file(file)
-        return @@files[file] if @@files.keys.include?(file)
-        raise ::Errno::ENOENT, "No such file or directory - #{file}"
+      def get_file(filename)
+        return @@files[filename] if @@files.keys.include?(filename)
+        raise ::Errno::ENOENT, "No such file or directory - #{filename}"
       end
     end
 
