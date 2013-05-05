@@ -107,11 +107,6 @@ module Standalone
       existing = ''
       existing = DummyFS.get_file(filename) if Standalone::File.file?(filename)
       f ||= super(existing)
-      if block_given?
-        yield f
-        close
-      end
-      f
     end
 
     def close
@@ -126,7 +121,13 @@ module Standalone
 
       def open(filename, mode = 'r', opt = nil, &block)
         #raise ::NotImplementedError, "Sandboxed File.open() only supports reading files."
-        self.new(filename, mode, opt, &block)
+        f = self.new(filename, mode, opt, &block)
+        if block_given?
+          yield f
+          f.close
+        else
+          f
+        end
       end
 
       # FIXME: File.file? should actually check if it's a file
