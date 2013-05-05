@@ -8,7 +8,7 @@ end
 
 module Standalone
   # This removes a constant (to avoid "already initialized constant"), then
-  # defines it to the value specified in Sicuro::Runtime::Constants.
+  # defines it to the value specified in the Standalone module.
   def self.enable!
     self.constants.each do |x|
       Object.instance_eval do
