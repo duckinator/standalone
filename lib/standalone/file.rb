@@ -120,7 +120,6 @@ module Standalone
       alias :'exists?' :'exist?'
 
       def open(filename, mode = 'r', opt = nil, &block)
-        #raise ::NotImplementedError, "Sandboxed File.open() only supports reading files."
         f = self.new(filename, mode, opt, &block)
         if block_given?
           yield f
