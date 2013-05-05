@@ -53,62 +53,80 @@ module Standalone
       @opt  = opt
       f = nil
       start = :end
-      mode  = :r
+      read  = true
+      write = false
       truncate = false
 
       case mode
       when "r"
         # Read-only, starts at beginning of file  (default mode).
         start = :beginning
-        mode =  :r
+        read  = true
+        write = false
         truncate = false
       when "r+"
         # Read-write, starts at beginning of file.
         start = :beginning
-        mode  = :rw
+        read  = true
+        write = true
         truncate = false
       when "w"
         # Write-only, truncates existing file
         # to zero length or creates a new file for writing.
         start = :beginning
-        mode  = :w
+        read  = false
+        write = true
         truncate = true
       when "w+"
         # Read-write, truncates existing file to zero length
         # or creates a new file for reading and writing.
         start = :beginning
-        mode  = :rw
+        read  = true
+        write = true
         truncate = true
       when "a"
         # Write-only, starts at end of file if file exists,
         # otherwise creates a new file for writing.
         start = :end
-        mode  = :w
+        read  = false
+        write = true
         truncate = false
       when "a+"
         # Read-write, starts at end of file if file exists,
         # otherwise creates a new file for reading and writing.
         start = :end
-        mode  = :rw
+        read  = true
+        write = true
         truncate = false
       end
 
-      if !File.file?(filename)
-        #if File.
+      if read && !Standalone::File.file?(filename)
+        raise ArgumentError, "invalid access mode #{mode}"
       end
 
-      f ||= super(::DummyFS.get_file(filename))
+      existing = ''
+      existing = DummyFS.get_file(filename) if Standalone::File.file?(filename)
+      f ||= super(existing)
+      if block_given?
+        yield f
+        close
+      end
+      f
+    end
+
+    def close
+      DummyFS.add_file(@filename, string)
     end
 
     class << self
       def exist?(filename)
-        ::DummyFS.has_file?(filename)
+        DummyFS.has_file?(filename)
       end
       alias :'exists?' :'exist?'
 
-      def open(filename, mode = 'r', opt = nil)
-        raise ::NotImplementedError, "Sandboxed File.open() only supports reading files."
-        ::DummyFS.get_file(filename)
+      def open(filename, mode = 'r', opt = nil, &block)
+        #raise ::NotImplementedError, "Sandboxed File.open() only supports reading files."
+        self.new(filename, mode, opt, &block)
       end
 
       # FIXME: File.file? should actually check if it's a file
