@@ -3,13 +3,21 @@ describe Standalone::DummyFS do
 
   # DummyFS.activate! cannot be tested, as far as I know.
 
-  dfs.add_file('/x/y', 'z')
+  it 'adds a file' do
+    dfs.add_file('/x/y', 'z')
+  end
 
-  dfs.has_file?('/x/y').should == true
-  dfs.has_file?('/x/a').should == false
-  dfs.find_file('y').should    == ['/x/y']
+  it 'can find an existing file' do
+    dfs.has_file?('/x/y').should == true
+  end
 
-  dfs.get_file('/x/y').should == 'z'
+  it 'cannot find a nonexistent file' do
+    dfs.has_file?('/x/a').should == false
+  end
+
+  it 'can read a file' do
+    dfs.get_file('/x/y')[:contents].should == 'z'
+  end
 
   it 'can read a file' do
     expect { dfs.get_file('/x/a') }.to raise_exception(::Errno::ENOENT)
@@ -21,7 +29,7 @@ describe Standalone::DummyFS do
     # I am well aware that this is bad, because it combines two functionalities
     # into one test. I'm not sure how to separate it, however.
     dfs.add_real_file(testfile)
-    dfs.get_file(testfile).should == open(testfile).read
+    dfs.get_file(testfile)[:contents].should == open(testfile).read
   end
 end
 
@@ -33,7 +41,7 @@ describe Standalone::File do
 
   file.exist?('a').should == true
   file.file?('a').should == true
-  #file.directory?('a').should == false
+  file.directory?('a').should == false
 
   file.dirname('a/b').should == "a"
   file.join('a', 'b').should == "a/b"

@@ -100,17 +100,22 @@ module Standalone
         truncate = false
       end
 
+      if read && !Standalone::File.exist?(filename)
+        raise Error::ENOENT, "No such file or directory - #{filename}"
+      end
+
       if read && !Standalone::File.file?(filename)
         raise ArgumentError, "invalid access mode #{mode}"
       end
 
       existing = ''
-      existing = DummyFS.get_file(filename) if Standalone::File.file?(filename)
+      existing = DummyFS.get_file(filename)[:contents] if Standalone::File.file?(filename)
+
       f ||= super(existing)
     end
 
     def close
-      DummyFS.add_file(@filename, string)
+      DummyFS.add_file(@filename, string)[:contents]
     end
 
     class << self
@@ -131,12 +136,12 @@ module Standalone
 
       # FIXME: File.file? should actually check if it's a file
       def file?(filename)
-        exist?(filename)
+        exist?(filename) && DummyFS.get_file(filename)[:type] == :file
       end
 
       # FIXME: File.directory? should actually check if it's a directory
       def directory?(filename)
-        exist?(filename)
+        exist?(filename) && DummyFS.get_file(filename)[:type] == :dir
       end
 
       def dirname(path)
