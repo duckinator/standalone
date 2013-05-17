@@ -101,7 +101,7 @@ module Standalone
       end
 
       if read && !Standalone::File.exist?(filename)
-        raise Error::ENOENT, "No such file or directory - #{filename}"
+        raise Error::ENOENT, filename
       end
 
       if read && !Standalone::File.file?(filename)

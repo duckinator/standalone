@@ -19,8 +19,8 @@ describe Standalone::DummyFS do
     dfs.get_file('/x/y')[:contents].should == 'z'
   end
 
-  it 'can read a file' do
-    expect { dfs.get_file('/x/a') }.to raise_exception(::Errno::ENOENT)
+  it 'cannot read a nonexistent file' do
+    dfs.get_file('/x/a')[:type].should == :nonexistent
   end
 
   testfile = File.join(File.dirname(__FILE__), 'data', 'dummyfs-test.txt')

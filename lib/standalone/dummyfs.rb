@@ -109,8 +109,8 @@ def fs;@@fs;end
           i += 1
         end
 
-        return tmp[:files][filename] if tmp[:files].keys.include?(filename) && tmp[:files][filename][:type] == :file && !error
-        raise ::Errno::ENOENT, "No such file or directory - #{filename}"
+        return tmp[:files][filename] if tmp[:files].keys.include?(filename) && !error
+        { :type => :nonexistent }
       end
     end
 
