@@ -100,16 +100,16 @@ module Standalone
         truncate = false
       end
 
-      if read && !Standalone::File.exist?(filename)
+      if read && !File.exist?(filename)
         raise Error::ENOENT, filename
       end
 
-      if read && !Standalone::File.file?(filename)
+      if read && !File.file?(filename)
         raise ArgumentError, "invalid access mode #{mode}"
       end
 
       existing = ''
-      existing = DummyFS.get_file(filename)[:contents] if Standalone::File.file?(filename)
+      existing = DummyFS.get_file(filename)[:contents] if File.file?(filename)
 
       f ||= super(existing)
     end
