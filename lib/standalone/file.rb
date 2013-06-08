@@ -101,7 +101,7 @@ module Standalone
       end
 
       if read && !File.exist?(filename)
-        raise Error::ENOENT, filename
+        raise Errno::ENOENT, filename
       end
 
       if read && !File.file?(filename)
