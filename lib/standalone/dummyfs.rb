@@ -49,8 +49,9 @@ def fs;@@fs;end
         # Inefficiencies, ahoy!
 
         ret = {}
+        regexp = %r[#{filename}(\..*)?$]
         tmp[:files].each do |key, val|
-          if key.match(%r[#{filename}(\..*)?$])
+          if key.match(regexp)
             ret[key] = val
           end
         end
