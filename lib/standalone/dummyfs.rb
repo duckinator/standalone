@@ -18,8 +18,8 @@ module Standalone
         return if @@configured
         @@configured ||= true
 
-        DummyFS.add_real_directory(File.dirname(__FILE__), '*.rb') do |filename|
-          filename.gsub(File.dirname(__FILE__), '').gsub(%r[^/..], STANDALONE_GEM_PATH)
+        DummyFS.add_real_directory(File.join(File.dirname(__FILE__), '..'), '*.rb') do |filename|
+          filename.gsub(File.dirname(__FILE__), '').gsub(%r[^/\.\.], STANDALONE_GEM_PATH)
         end
       end
 
