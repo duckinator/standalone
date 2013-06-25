@@ -8,20 +8,28 @@ module Standalone
     class << self
       @@configured = false
       @@fs = { type: :dir, files: {} }
-def fs;@@fs;end
+      @@libraries = []
+
+      def fs
+        @@fs
+      end
+
       def setup
         return if @@configured
         @@configured ||= true
 
-        Dir[File.join(File.dirname(__FILE__), '..', '**', '*.rb')].each do |filename|
-          fake_filename = filename.gsub(File.dirname(__FILE__), '').gsub(%r[^/..], STANDALONE_GEM_PATH)
-          DummyFS.add_real_file(filename, fake_filename)
+        DummyFS.add_real_directory(File.dirname(__FILE__), '*.rb') do |filename|
+          filename.gsub(File.dirname(__FILE__), '').gsub(%r[^/..], STANDALONE_GEM_PATH)
         end
       end
 
       def activate!
         $:.clear
         $: << STANDALONE_GEM_PATH
+
+        @@libraries.each do |library|
+          $: << library
+        end
       end
 
       def has_file?(filename)
@@ -89,6 +97,23 @@ def fs;@@fs;end
         end
 
         tmp
+      end
+
+      def add_real_directory(dirname, file_glob='*', library=false)
+        Dir[File.join(dirname, '**', file_glob)].each do |filename|
+          fake_filename = filename
+          fake_filename = yield(filename) if block_given?
+
+          DummyFS.add_real_file(filename, fake_filename)
+        end
+
+        if library
+          if block_given?
+            @@libraries << yield(dirname)
+          else
+            @@libraries << dirname
+          end
+        end
       end
 
       def get_file(filename)
