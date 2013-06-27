@@ -2,8 +2,8 @@ module Standalone
   module DummyFS
     # Worst excuse of an FS ever.
 
-    FAKE_GEM_DIR = File.join('home', 'standalone', '.gem', 'ruby', RUBY_VERSION, 'gems')
-    STANDALONE_GEM_PATH = File.join(FAKE_GEM_DIR, 'standalone', 'lib', 'standalone')
+    FAKE_GEM_DIR = File.join('', 'home', 'standalone', '.gem', 'ruby', RUBY_VERSION, 'gems')
+    STANDALONE_GEM_PATH = File.join(FAKE_GEM_DIR, 'standalone', 'lib')
 
     class << self
       @@configured = false
@@ -18,18 +18,22 @@ module Standalone
         return if @@configured
         @@configured ||= true
 
-        DummyFS.add_real_directory(File.join(File.dirname(__FILE__), '..'), '*.rb') do |filename|
+        add_real_directory(File.join(File.dirname(__FILE__), '..'), '*.rb', true) do |filename|
           filename.gsub(File.dirname(__FILE__), '').gsub(%r[^/\.\.], STANDALONE_GEM_PATH)
         end
       end
 
-      def activate!
+      def enable!
         $:.clear
-        $: << STANDALONE_GEM_PATH
 
         @@libraries.each do |library|
           $: << library
         end
+      end
+
+      def add_library(library)
+        @@libraries << library
+        $: << library
       end
 
       def has_file?(filename)
@@ -76,7 +80,7 @@ module Standalone
 
       def add_real_file(filename, name = nil)
         name ||= filename
-        DummyFS.add_file(name, open(filename).read)
+        add_file(name, open(filename).read)
       end
 
       def add_directory(filename)
@@ -104,14 +108,14 @@ module Standalone
           fake_filename = filename
           fake_filename = yield(filename) if block_given?
 
-          DummyFS.add_real_file(filename, fake_filename)
+          add_real_file(filename, fake_filename)
         end
 
         if library
           if block_given?
-            @@libraries << yield(dirname)
+            add_library yield(dirname)
           else
-            @@libraries << dirname
+            add_library dirname
           end
         end
       end
