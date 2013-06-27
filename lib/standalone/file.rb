@@ -151,6 +151,20 @@ module Standalone
       def join(*args)
         args.join('/')
       end
+
+      # FIXME: File.expand_path is bullshit.
+      def expand_path(file_name, dir_string = nil)
+        # TODO: do something with dir_string
+
+        parent_dir_cancel = /(^|\/).*\/..(\/|$)/
+        file_name.sub!(parent_dir_cancel, '') while file_name =~ parent_dir_cancel
+
+        parent_dir_userless = /^..\//
+        file_name.sub!(parent_dir_userless, '') while file_name =~ parent_dir_userless
+
+        file_name
+      end
+
     end
 
   end
