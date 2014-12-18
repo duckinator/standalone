@@ -1,6 +1,6 @@
 require 'standalone/file'
 require 'standalone/stringio'
-require 'standalone/dummyfs'
+require 'standalone/runtime/file_system'
 
 module Standalone
   class File < StringIO
@@ -109,18 +109,18 @@ module Standalone
       end
 
       existing = ''
-      existing = DummyFS.get_file(filename)[:contents] if File.file?(filename)
+      existing = Runtime::FileSystem.get_file(filename)[:contents] if File.file?(filename)
 
       f ||= super(existing)
     end
 
     def close
-      DummyFS.add_file(@filename, string)[:contents]
+      Runtime::FileSystem.add_file(@filename, string)[:contents]
     end
 
     class << self
       def exist?(filename)
-        DummyFS.has_file?(filename)
+        Runtime::FileSystem.has_file?(filename)
       end
       alias :'exists?' :'exist?'
 
@@ -136,12 +136,12 @@ module Standalone
 
       # FIXME: File.file? should actually check if it's a file
       def file?(filename)
-        exist?(filename) && DummyFS.get_file(filename)[:type] == :file
+        exist?(filename) && Runtime::FileSystem.get_file(filename)[:type] == :file
       end
 
       # FIXME: File.directory? should actually check if it's a directory
       def directory?(filename)
-        exist?(filename) && DummyFS.get_file(filename)[:type] == :dir
+        exist?(filename) && Runtime::FileSystem.get_file(filename)[:type] == :dir
       end
 
       def dirname(path)
