@@ -3,7 +3,9 @@ module Standalone
     # Worst excuse of an FS ever.
 
     FAKE_GEM_DIR = File.join('', 'home', 'standalone', '.gem', 'ruby', RUBY_VERSION, 'gems')
-    STANDALONE_GEM_PATH = File.join(FAKE_GEM_DIR, 'standalone', 'lib')
+    STANDALONE_REAL_GEM_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
+
+    STANDALONE_GEM_PATH = File.join(FAKE_GEM_DIR, 'standalone')
 
     class << self
       @@configured = false
@@ -18,8 +20,8 @@ module Standalone
         return if @@configured
         @@configured ||= true
 
-        add_real_directory(File.join(File.dirname(__FILE__), '..'), '*.rb', true) do |filename|
-          filename.gsub(File.dirname(__FILE__), '').gsub(%r[^/\.\.], STANDALONE_GEM_PATH)
+        add_real_directory(File.join(File.dirname(__FILE__), '..', '..'), '*.rb', true) do |filename|
+          filename.sub(STANDALONE_REAL_GEM_PATH, STANDALONE_GEM_PATH)
         end
       end
 
@@ -103,19 +105,27 @@ module Standalone
         tmp
       end
 
-      def add_real_directory(dirname, file_glob='*', library=false)
-        Dir[File.join(dirname, '**', file_glob)].each do |filename|
-          fake_filename = filename
-          fake_filename = yield(filename) if block_given?
+      def add_real_directory(dirname, file_glob='*', library=false, &block)
+        Dir[::File.join(dirname, '**', file_glob)].each do |filename|
+          filename = File.expand_path(filename)
 
-          add_real_file(filename, fake_filename)
+          if ::File.directory?(filename)
+            add_real_directory(filename, file_glob, false, &block)
+          else
+            fake_filename = filename
+            fake_filename = yield(filename) if block_given?
+
+            add_real_file(filename, fake_filename)
+          end
         end
 
         if library
+          lib_dir = File.expand_path(File.join(dirname, 'lib'))
+
           if block_given?
-            add_library yield(dirname)
+            add_library yield(lib_dir)
           else
-            add_library dirname
+            add_library lib_dir
           end
         end
       end

@@ -31,6 +31,12 @@ describe Standalone::DummyFS do
     dfs.add_real_file(testfile)
     dfs.get_file(testfile)[:contents].should == open(testfile).read
   end
+
+  it "has #{__FILE__.inspect}" do
+    filename = __FILE__.sub(Standalone::DummyFS::STANDALONE_REAL_GEM_PATH, Standalone::DummyFS::STANDALONE_GEM_PATH)
+
+    dfs.get_file(filename)[:contents].should == open(__FILE__).read
+  end
 end
 
 describe Standalone::File do
